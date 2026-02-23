@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rainbow Ruckus Lab</title>
+  <style>
+    :root {
+      --bg-1: #ffe66d;
+      --bg-2: #ff6b6b;
+      --bg-3: #4ecdc4;
+      --ink: #102a43;
+      --panel: rgba(255, 255, 255, 0.85);
+      --accent: #ff7f11;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 20%, var(--bg-1), transparent 25%),
+        radial-gradient(circle at 80% 25%, var(--bg-2), transparent 20%),
+        radial-gradient(circle at 50% 80%, var(--bg-3), transparent 30%),
+        linear-gradient(120deg, #ffbe0b, #fb5607, #3a86ff);
+      background-size: 120% 120%;
+      animation: swirl 14s ease-in-out infinite alternate;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+    }
+
+    @keyframes swirl {
+      from { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 50%; }
+      to { background-position: 20% 20%, 80% 30%, 40% 90%, 100% 50%; }
+    }
+
+    .app {
+      width: min(900px, 100%);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: 0 20px 45px rgba(16, 42, 67, 0.25);
+      overflow: hidden;
+      border: 4px solid #fff;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: pop-in 600ms ease forwards;
+    }
+
+    @keyframes pop-in {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    header {
+      padding: 1rem 1.2rem;
+      background: repeating-linear-gradient(
+        -45deg,
+        #ffadad,
+        #ffadad 12px,
+        #ffd6a5 12px,
+        #ffd6a5 24px
+      );
+      border-bottom: 3px dashed rgba(16, 42, 67, 0.25);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 5vw, 2.6rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 #fff;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+      padding: 1rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 760px) {
+      .grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 0.9rem;
+      border: 2px solid rgba(16, 42, 67, 0.15);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 320px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #e0fbfc, #c2f2ff);
+      border: 2px solid rgba(16, 42, 67, 0.15);
+    }
+
+    .controls {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.6rem 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: #3a86ff;
+      color: #fff;
+      box-shadow: 0 4px 0 #245db5;
+      transition: transform 130ms ease;
+    }
+
+    button:nth-child(2n) { background: #ff7f11; box-shadow: 0 4px 0 #bf5d09; }
+    button:nth-child(3n) { background: #06d6a0; box-shadow: 0 4px 0 #049d75; }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+
+    label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .caption {
+      margin: 0;
+      min-height: 2.5rem;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      background: #fff3b0;
+      border-radius: 12px;
+      border: 2px dashed rgba(16, 42, 67, 0.2);
+      padding: 0.5rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+
+    .chip {
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      background: #f0f4f8;
+      border: 1px solid #bcccdc;
+      font-size: 0.85rem;
+    }
+
+    .madlibs {
+      margin: 0 1rem 1rem;
+      background: #fff;
+      border-radius: 18px;
+      border: 2px solid rgba(16, 42, 67, 0.15);
+      padding: 1rem;
+    }
+
+    .madlibs h2 {
+      margin: 0 0 0.7rem;
+      font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    }
+
+    .mad-grid {
+      display: grid;
+      gap: 0.6rem;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      margin-bottom: 0.75rem;
+    }
+
+    .mad-grid input {
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid #bcccdc;
+      padding: 0.5rem 0.6rem;
+      font: inherit;
+    }
+
+    .story {
+      margin: 0.75rem 0 0;
+      background: #f0f9ff;
+      border: 2px dashed rgba(16, 42, 67, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      line-height: 1.45;
+      min-height: 3.5rem;
+      font-weight: 700;
+    }
+
+    .story[hidden] {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Rainbow Ruckus Lab</h1>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <canvas id="party" width="700" height="320"></canvas>
+      </div>
+
+      <div class="card controls">
+        <p class="caption" id="caption">Press a button to start the silliness.</p>
+
+        <div>
+          <label for="crazy">How chaotic?</label>
+          <input id="crazy" type="range" min="1" max="20" value="8" />
+          <div class="chips">
+            <span class="chip" id="counter">Blobs: 8</span>
+            <span class="chip" id="gravity">Gravity: On</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="add">Add Blob</button>
+          <button id="burst">Confetti Burst</button>
+          <button id="flip">Flip Gravity</button>
+          <button id="phrase">Silly Phrase</button>
+          <button id="clear">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="madlibs">
+      <h2>Mad Libs Story Machine</h2>
+      <div class="mad-grid">
+        <div>
+          <label for="noun1">Noun</label>
+          <input id="noun1" type="text" />
+        </div>
+        <div>
+          <label for="noun2">Another Noun</label>
+          <input id="noun2" type="text" />
+        </div>
+        <div>
+          <label for="adj1">Adjective</label>
+          <input id="adj1" type="text" />
+        </div>
+        <div>
+          <label for="adj2">Another Adjective</label>
+          <input id="adj2" type="text" />
+        </div>
+        <div>
+          <label for="verb1">Verb</label>
+          <input id="verb1" type="text" />
+        </div>
+        <div>
+          <label for="place">Place</label>
+          <input id="place" type="text" />
+        </div>
+      </div>
+      <div class="row">
+        <button id="makeStory">Make Silly Story</button>
+      </div>
+      <p class="story" id="storyOutput" hidden></p>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('party');
+    const ctx = canvas.getContext('2d');
+    const caption = document.getElementById('caption');
+    const crazy = document.getElementById('crazy');
+    const counter = document.getElementById('counter');
+    const gravityTag = document.getElementById('gravity');
+    const storyOutput = document.getElementById('storyOutput');
+
+    const phrases = [
+      'A giggle-powered hover potato appears!',
+      'Warning: Dance mode activated.',
+      'A rainbow sneezed on your screen.',
+      'You unlocked level: Banana Wizard.',
+      'Tiny dragons approve this experiment.'
+    ];
+
+    const palette = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#ff7f11', '#00afb9'];
+    const storyTemplates = [
+      ({ noun1, noun2, adj1, adj2, verb1, place }) =>
+        `Yesterday at ${place}, a ${adj1} ${noun1} rolled in wearing seven capes and announced it was the new principal of recess. Before anyone could ask questions, it started to ${verb1} in giant circles around a ${adj2} ${noun2}, humming the national anthem of Jellybean Kingdom. A marching band made entirely of squirrels appeared from behind a snack cart, playing kazoo solos while the mayor tried to keep a straight face. Then the ${noun1} handed out emergency glitter helmets, declared floor lava drills every six minutes, and challenged the gym teacher to a trampoline debate about whether pancakes should be square. By sunset, everyone agreed it was the weirdest and best school day ever, and the sky celebrated with a surprise confetti thunderstorm.`,
+      ({ noun1, noun2, adj1, adj2, verb1, place }) =>
+        `At ${place}, the mayor of Snack Town discovered a ${adj1} ${noun1} parked in the fountain and politely asked for its library card. The ${noun1} responded by attempting to ${verb1} a ${adj2} ${noun2} while balancing on roller skates made from waffles, which immediately caused traffic to stop so everyone could watch. Next, a panel of serious judges rated the performance on sparkle, style, and snack safety, and somehow gave it eleven out of ten in every category. The town council held an emergency meeting, voted to rename Fridays to Wobble Day, and passed a law requiring all speeches to end with jazz hands. By evening, fireworks shaped like noodles lit the sky as the new town mascot rode through the parade on a pogo stick shouting, \"Long live silliness!\"`,
+      ({ noun1, noun2, adj1, adj2, verb1, place }) =>
+        `Breaking news from ${place}: a ${adj2} ${noun2} challenged a ${adj1} ${noun1} to a grand dance-off in front of exactly one million rubber ducks. The opening move involved synchronized moonwalking, dramatic drumrolls, and a surprise choir singing opera about macaroni, which made the crowd laugh so hard they dropped their popcorn. Midway through round two, the lights flashed, a disco tornado spun across the stage, and both competitors had to ${verb1} while avoiding flying marshmallows launched from tiny catapults. The judges argued for an hour using interpretive dance, then declared a tie and ordered a final round on pogo sticks over a foam pit shaped like a taco. In the end, both champions shared the glitter trophy, the ducks demanded an encore, and the celebration continued until every last jellybean was gone.`
+    ];
+    const soundQueueNames = ['flatulence', 'scream', 'laughter', 'belch', 'pig oink', 'bell', 'microwave beeps'];
+    let audioCtx;
+    let soundQueue = [];
+
+    let blobs = [];
+    let confetti = [];
+    let gravity = 0.12;
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function tone(freq, start, duration, type = 'sine', gain = 0.07) {
+      const ctx = ensureAudio();
+      const osc = ctx.createOscillator();
+      const amp = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, start);
+      amp.gain.setValueAtTime(0.0001, start);
+      amp.gain.exponentialRampToValueAtTime(gain, start + 0.01);
+      amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      osc.connect(amp);
+      amp.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.02);
+      return osc;
+    }
+
+    function noiseBurst(start, duration, gain = 0.04) {
+      const ctx = ensureAudio();
+      const sampleRate = ctx.sampleRate;
+      const frameCount = Math.floor(sampleRate * duration);
+      const buffer = ctx.createBuffer(1, frameCount, sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < frameCount; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / frameCount);
+      const src = ctx.createBufferSource();
+      const amp = ctx.createGain();
+      src.buffer = buffer;
+      amp.gain.setValueAtTime(gain, start);
+      src.connect(amp);
+      amp.connect(ctx.destination);
+      src.start(start);
+      src.stop(start + duration);
+    }
+
+    function playFlatulence() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      const osc = tone(140, t, 0.65, 'sawtooth', 0.08);
+      osc.frequency.exponentialRampToValueAtTime(52, t + 0.62);
+      noiseBurst(t + 0.02, 0.58, 0.02);
+    }
+
+    function playScream() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      const osc = tone(620, t, 0.75, 'triangle', 0.07);
+      osc.frequency.exponentialRampToValueAtTime(1220, t + 0.24);
+      osc.frequency.exponentialRampToValueAtTime(820, t + 0.74);
+      tone(930, t + 0.05, 0.55, 'square', 0.02);
+    }
+
+    function playLaughter() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      for (let i = 0; i < 6; i++) {
+        const when = t + i * 0.11;
+        const osc = tone(300 + (i % 2 ? 120 : 0), when, 0.08, 'triangle', 0.06);
+        osc.frequency.exponentialRampToValueAtTime(180 + i * 5, when + 0.08);
+      }
+    }
+
+    function playBelch() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      const osc = tone(180, t, 0.7, 'sawtooth', 0.09);
+      osc.frequency.exponentialRampToValueAtTime(65, t + 0.68);
+      noiseBurst(t + 0.18, 0.45, 0.015);
+    }
+
+    function playPigOink() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      const osc = tone(220, t, 0.1, 'square', 0.06);
+      osc.frequency.exponentialRampToValueAtTime(460, t + 0.07);
+      tone(300, t + 0.12, 0.12, 'square', 0.06);
+    }
+
+    function playBell() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      tone(1046, t, 1.4, 'sine', 0.05);
+      tone(1318, t, 1.2, 'sine', 0.035);
+      tone(1567, t, 1.0, 'sine', 0.025);
+    }
+
+    function playMicrowaveBeeps() {
+      const ctx = ensureAudio();
+      const t = ctx.currentTime + 0.01;
+      tone(1200, t, 0.12, 'square', 0.05);
+      tone(1200, t + 0.2, 0.12, 'square', 0.05);
+      tone(1200, t + 0.4, 0.12, 'square', 0.05);
+    }
+
+    function playSoundByName(name) {
+      if (name === 'flatulence') playFlatulence();
+      if (name === 'scream') playScream();
+      if (name === 'laughter') playLaughter();
+      if (name === 'belch') playBelch();
+      if (name === 'pig oink') playPigOink();
+      if (name === 'bell') playBell();
+      if (name === 'microwave beeps') playMicrowaveBeeps();
+    }
+
+    function nextSoundName() {
+      if (!soundQueue.length) {
+        soundQueue = [...soundQueueNames];
+        for (let i = soundQueue.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [soundQueue[i], soundQueue[j]] = [soundQueue[j], soundQueue[i]];
+        }
+      }
+      return soundQueue.pop();
+    }
+
+    function makeBlob(x = random(30, canvas.width - 30), y = random(30, canvas.height - 30)) {
+      return {
+        x,
+        y,
+        r: random(12, 28),
+        dx: random(-2.2, 2.2),
+        dy: random(-2, 1.5),
+        c: palette[(Math.random() * palette.length) | 0]
+      };
+    }
+
+    function reseed(n) {
+      blobs = [];
+      for (let i = 0; i < n; i++) blobs.push(makeBlob());
+      counter.textContent = `Blobs: ${blobs.length}`;
+    }
+
+    function say(text) {
+      caption.textContent = text;
+      caption.animate(
+        [
+          { transform: 'scale(0.98)', filter: 'hue-rotate(0deg)' },
+          { transform: 'scale(1.03)', filter: 'hue-rotate(30deg)' },
+          { transform: 'scale(1)', filter: 'hue-rotate(0deg)' }
+        ],
+        { duration: 420, easing: 'ease-out' }
+      );
+    }
+
+    function burst() {
+      for (let i = 0; i < 90; i++) {
+        confetti.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          dx: random(-3.7, 3.7),
+          dy: random(-5.5, 2.2),
+          life: random(30, 70),
+          c: palette[(Math.random() * palette.length) | 0],
+          s: random(3, 8)
+        });
+      }
+      say('KABLOOM! Confetti deployed.');
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const b of blobs) {
+        b.dy += gravity;
+        b.x += b.dx;
+        b.y += b.dy;
+
+        if (b.x < b.r || b.x > canvas.width - b.r) {
+          b.dx *= -1;
+          b.x = Math.max(b.r, Math.min(canvas.width - b.r, b.x));
+        }
+
+        if (b.y < b.r || b.y > canvas.height - b.r) {
+          b.dy *= -0.92;
+          b.y = Math.max(b.r, Math.min(canvas.height - b.r, b.y));
+        }
+
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = b.c;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(16,42,67,0.18)';
+        ctx.stroke();
+      }
+
+      confetti = confetti.filter((p) => {
+        p.dy += 0.14;
+        p.x += p.dx;
+        p.y += p.dy;
+        p.life -= 1;
+        ctx.fillStyle = p.c;
+        ctx.fillRect(p.x, p.y, p.s, p.s);
+        return p.life > 0;
+      });
+
+      requestAnimationFrame(tick);
+    }
+
+    document.getElementById('add').addEventListener('click', () => {
+      blobs.push(makeBlob());
+      counter.textContent = `Blobs: ${blobs.length}`;
+      say('Another wobbly blob joins the party.');
+    });
+
+    document.getElementById('burst').addEventListener('click', burst);
+
+    document.getElementById('flip').addEventListener('click', () => {
+      gravity = gravity ? 0 : 0.12;
+      gravityTag.textContent = gravity ? 'Gravity: On' : 'Gravity: Off';
+      say(gravity ? 'Gravity is back on duty.' : 'Zero gravity! Blobs are floating.');
+    });
+
+    document.getElementById('phrase').addEventListener('click', () => {
+      say(phrases[(Math.random() * phrases.length) | 0]);
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      reseed(Number(crazy.value));
+      confetti = [];
+      say('Scene reset. Maximum silliness restored.');
+    });
+
+    crazy.addEventListener('input', (e) => {
+      reseed(Number(e.target.value));
+      say('Chaos level adjusted.');
+    });
+
+    document.getElementById('makeStory').addEventListener('click', () => {
+      const entered = {
+        noun1: document.getElementById('noun1').value.trim(),
+        noun2: document.getElementById('noun2').value.trim(),
+        adj1: document.getElementById('adj1').value.trim(),
+        adj2: document.getElementById('adj2').value.trim(),
+        verb1: document.getElementById('verb1').value.trim(),
+        place: document.getElementById('place').value.trim()
+      };
+      const words = {
+        noun1: entered.noun1 || 'pickle',
+        noun2: entered.noun2 || 'spaceship',
+        adj1: entered.adj1 || 'sparkly',
+        adj2: entered.adj2 || 'squishy',
+        verb1: entered.verb1 || 'jiggle',
+        place: entered.place || 'moon castle'
+      };
+      const template = storyTemplates[(Math.random() * storyTemplates.length) | 0];
+      const story = template(words);
+      const allPromptsEntered = Object.values(entered).every(Boolean);
+      if (!allPromptsEntered) {
+        storyOutput.textContent = story;
+        storyOutput.hidden = true;
+        say('Fill in every Mad Lib box to reveal the story.');
+        return;
+      }
+      storyOutput.hidden = false;
+      storyOutput.textContent = story;
+      say('Mad Lib completed. Story engines are humming.');
+      burst();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('button')) return;
+      playSoundByName(nextSoundName());
+    });
+
+    reseed(Number(crazy.value));
+    tick();
+  </script>
+</body>
+</html>
